@@ -11,7 +11,7 @@ Defina estas variáveis **no servidor Chatwoot** (web e workers):
 ```text
 FOOD2C_TEMPLATE_APP_URL=https://api.food2c.com.br/whatsapp-chatwoot/template-app
 FOOD2C_TEMPLATE_APP_SECRET=<mesmo valor de TEMPLATE_APP_SECRET no serviço Food2C>
-FOOD2C_TABULATION_REQUIRED_ACCOUNT_IDS=<IDs das contas Chatwoot separados por vírgula>
+FOOD2C_TABULATION_REQUIRED_ACCOUNT_IDS=1
 ```
 
 O proxy usa o token somente no servidor, encaminha as chamadas com a sessão do
@@ -38,8 +38,8 @@ produção oficial usa `chatwoot/chatwoot:latest`; o arquivo
 `docker-compose.food2c.yaml` substitui essa imagem pelo build do fork para os
 serviços `rails` e `sidekiq`.
 
-No arquivo `.env` da instalação, configure as três variáveis acima. Consulte o
-ID real em uma URL do Chatwoot, no trecho `/app/accounts/<ID>/`.
+No arquivo `.env` da instalação, configure as três variáveis acima. O ID `1`
+foi confirmado pela URL da conta Food2C (`/app/accounts/1/`).
 
 Antes da troca, faça um backup do PostgreSQL e do arquivo `.env` da instância.
 Na pasta do fork no Lightsail:
