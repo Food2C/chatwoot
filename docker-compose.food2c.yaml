@@ -1,0 +1,10 @@
+# Use alongside docker-compose.production.yaml when deploying the Food2C fork.
+services:
+  rails:
+    image: food2c/chatwoot:4.16.2-food2c
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+
+  sidekiq:
+    image: food2c/chatwoot:4.16.2-food2c

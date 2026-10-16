@@ -30,3 +30,25 @@ preenchido diretamente nos atributos personalizados do Chatwoot satisfaz a
 validação, mas não cria um registro no relatório Food2C; para manter o relatório
 completo, tabule pela Dashboard App Food2C. O relatório também depende do
 DocumentDB e do serviço de integração estarem disponíveis.
+
+## Docker Compose no Lightsail
+
+No fork, use a branch `food2c/chatwoot-4.16.2-integration`. O compose de
+produção oficial usa `chatwoot/chatwoot:latest`; o arquivo
+`docker-compose.food2c.yaml` substitui essa imagem pelo build do fork para os
+serviços `rails` e `sidekiq`.
+
+No arquivo `.env` da instalação, configure as três variáveis acima. Consulte o
+ID real em uma URL do Chatwoot, no trecho `/app/accounts/<ID>/`.
+
+Antes da troca, faça um backup do PostgreSQL e do arquivo `.env` da instância.
+Na pasta do fork no Lightsail:
+
+```bash
+docker compose -f docker-compose.production.yaml -f docker-compose.food2c.yaml build rails
+docker compose -f docker-compose.production.yaml -f docker-compose.food2c.yaml up -d rails sidekiq
+```
+
+Confirme a versão e as variáveis nos contêineres após subir. O build local deve
+ser feito sobre esta branch; puxar apenas a imagem oficial do Docker Hub não
+inclui as alterações Food2C.
