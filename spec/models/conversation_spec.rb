@@ -372,9 +372,28 @@ RSpec.describe Conversation do
       it 'allows resolution after tabulation is saved' do
         conversation = create(:conversation, account: account, status: :open,
                                                custom_attributes: { food2c_tabulation: 'Venda concluída' })
+        allow(Food2cClassificationVerifier).to receive(:status).with(conversation).and_return(:confirmed)
 
         expect(conversation.toggle_status).to be(true)
         expect(conversation.reload).to be_resolved
+      end
+
+      it 'rejects a tabulation typed directly in Chatwoot without a synced Food2C record' do
+        conversation = create(:conversation, account: account, status: :open,
+                                               custom_attributes: { food2c_tabulation: 'Digitada à mão' })
+        allow(Food2cClassificationVerifier).to receive(:status).with(conversation).and_return(:missing)
+
+        expect(conversation.toggle_status).to be(false)
+        expect(conversation.errors.full_messages).to include('Tabule o atendimento na aplicação Food2C antes de encerrar.')
+      end
+
+      it 'keeps the conversation open when verification is unavailable' do
+        conversation = create(:conversation, account: account, status: :open,
+                                               custom_attributes: { food2c_tabulation: 'Venda concluída' })
+        allow(Food2cClassificationVerifier).to receive(:status).with(conversation).and_return(:unavailable)
+
+        expect(conversation.toggle_status).to be(false)
+        expect(conversation.errors.full_messages).to include('Não foi possível confirmar a tabulação Food2C. Tente novamente.')
       end
 
       it 'allows other accounts to resolve normally' do

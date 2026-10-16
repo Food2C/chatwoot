@@ -22,14 +22,16 @@ as conversas. Somente administradores da conta podem alterar as opções de
 tabulação pelo proxy.
 
 A exigência de tabulação é aplicada pelo modelo `Conversation`, incluindo
-resoluções pela interface e pela API. Se a conta não estiver listada em
+resoluções pela interface e pela API. Antes de resolver, o Chatwoot confirma
+que o valor está sincronizado no relatório do serviço Food2C. Se o serviço
+estiver indisponível, a resolução fica bloqueada até que a confirmação volte
+a funcionar. Se a conta não estiver listada em
 `FOOD2C_TABULATION_REQUIRED_ACCOUNT_IDS`, o fluxo padrão permanece.
 
-O valor `food2c_tabulation` é o sinal de tabulação usado na resolução. Um valor
-preenchido diretamente nos atributos personalizados do Chatwoot satisfaz a
-validação, mas não cria um registro no relatório Food2C; para manter o relatório
-completo, tabule pela Dashboard App Food2C. O relatório também depende do
-DocumentDB e do serviço de integração estarem disponíveis.
+Um valor preenchido diretamente nos atributos personalizados do Chatwoot sem
+registro `synced` correspondente no DocumentDB não permite encerrar a conversa.
+Tabule pela Dashboard App Food2C para manter a observação e o relatório
+completos.
 
 ## Docker Compose no Lightsail
 

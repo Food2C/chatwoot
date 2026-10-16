@@ -172,9 +172,19 @@ class Conversation < ApplicationRecord
 
     account_ids = ENV.fetch('FOOD2C_TABULATION_REQUIRED_ACCOUNT_IDS', '').split(',').map(&:strip)
     return unless account_ids.include?(account_id.to_s)
-    return if custom_attributes&.dig('food2c_tabulation').present?
+    if custom_attributes&.dig('food2c_tabulation').blank?
+      errors.add(:base, 'Tabule o atendimento antes de encerrar.')
+      return
+    end
 
-    errors.add(:base, 'Tabule o atendimento antes de encerrar.')
+    case Food2cClassificationVerifier.status(self)
+    when :confirmed
+      nil
+    when :unavailable
+      errors.add(:base, 'Não foi possível confirmar a tabulação Food2C. Tente novamente.')
+    else
+      errors.add(:base, 'Tabule o atendimento na aplicação Food2C antes de encerrar.')
+    end
   end
 
   def toggle_priority(priority = nil)
