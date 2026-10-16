@@ -88,6 +88,8 @@ class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseContro
     else
       @status = @conversation.toggle_status
     end
+    return render json: { error: @conversation.errors.full_messages.join(', ') }, status: :unprocessable_entity if @conversation.errors.any?
+
     handle_human_open if @conversation.open? && Current.user.is_a?(User)
   end
 

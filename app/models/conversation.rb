@@ -79,6 +79,7 @@ class Conversation < ApplicationRecord
   validates :custom_attributes, jsonb_attributes_length: true
   validates :uuid, uniqueness: true
   validate :validate_referer_url
+  validate :require_food2c_tabulation_before_resolution
 
   enum status: { open: 0, resolved: 1, pending: 2, snoozed: 3 }
   enum priority: { low: 0, medium: 1, high: 2, urgent: 3 }
@@ -164,6 +165,16 @@ class Conversation < ApplicationRecord
     self.status = open? ? :resolved : :open
     self.status = :open if pending? || snoozed?
     save
+  end
+
+  def require_food2c_tabulation_before_resolution
+    return unless will_save_change_to_status? && resolved?
+
+    account_ids = ENV.fetch('FOOD2C_TABULATION_REQUIRED_ACCOUNT_IDS', '').split(',').map(&:strip)
+    return unless account_ids.include?(account_id.to_s)
+    return if custom_attributes&.dig('food2c_tabulation').present?
+
+    errors.add(:base, 'Tabule o atendimento antes de encerrar.')
   end
 
   def toggle_priority(priority = nil)

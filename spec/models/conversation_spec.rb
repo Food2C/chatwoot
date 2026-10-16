@@ -349,6 +349,41 @@ RSpec.describe Conversation do
   end
 
   describe '#toggle_status' do
+    context 'when Food2C requires tabulation' do
+      around do |example|
+        previous = ENV.fetch('FOOD2C_TABULATION_REQUIRED_ACCOUNT_IDS', nil)
+        ENV['FOOD2C_TABULATION_REQUIRED_ACCOUNT_IDS'] = account.id.to_s
+        example.run
+      ensure
+        ENV['FOOD2C_TABULATION_REQUIRED_ACCOUNT_IDS'] = previous
+      end
+
+      let(:account) { create(:account) }
+
+      it 'rejects resolution without tabulation through toggle and direct updates' do
+        conversation = create(:conversation, account: account, status: :open)
+
+        expect(conversation.toggle_status).to be(false)
+        expect(conversation.reload).to be_open
+        expect(conversation.update(status: :resolved)).to be(false)
+        expect(conversation.errors.full_messages).to include('Tabule o atendimento antes de encerrar.')
+      end
+
+      it 'allows resolution after tabulation is saved' do
+        conversation = create(:conversation, account: account, status: :open,
+                                               custom_attributes: { food2c_tabulation: 'Venda concluída' })
+
+        expect(conversation.toggle_status).to be(true)
+        expect(conversation.reload).to be_resolved
+      end
+
+      it 'allows other accounts to resolve normally' do
+        conversation = create(:conversation, status: :open)
+
+        expect(conversation.toggle_status).to be(true)
+      end
+    end
+
     it 'toggles conversation status to resolved when open' do
       conversation = create(:conversation, status: 'open')
       expect(conversation.toggle_status).to be(true)

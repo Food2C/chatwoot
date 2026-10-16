@@ -588,6 +588,12 @@ const menuItems = computed(() => {
       icon: 'i-lucide-contact',
       children: [
         {
+          name: 'Food2C New Conversation',
+          label: 'Nova conversa Food2C',
+          to: accountScopedRoute('food2c_new'),
+          activeOn: ['food2c_new'],
+        },
+        {
           name: 'All Contacts',
           label: t('SIDEBAR.ALL_CONTACTS'),
           to: accountScopedRoute(
@@ -671,6 +677,12 @@ const menuItems = computed(() => {
       label: t('SIDEBAR.REPORTS'),
       icon: 'i-lucide-chart-spline',
       children: [
+        {
+          name: 'Food2C Report',
+          label: 'Relatório Food2C',
+          to: accountScopedRoute('food2c_report'),
+          activeOn: ['food2c_report'],
+        },
         {
           name: 'Report Overview',
           label: t('SIDEBAR.REPORTS_OVERVIEW'),

@@ -140,6 +140,14 @@ Rails.application.routes.draw do
           end
           resources :campaigns, only: [:index, :create, :show, :update, :destroy]
           resources :dashboard_apps, only: [:index, :show, :create, :update, :destroy]
+          get 'food2c/template-app/new', to: 'food2c_template_app#show', defaults: { page: 'new' }
+          get 'food2c/template-app/report', to: 'food2c_template_app#show', defaults: { page: 'report' }
+          get 'food2c/template-app/channels', to: 'food2c_template_app#channels'
+          post 'food2c/template-app/:endpoint', to: 'food2c_template_app#proxy',
+               constraints: { endpoint: /templates|customer|history|send|classification-options/ }
+          post 'food2c/template-app/customers/search', to: 'food2c_template_app#proxy', defaults: { endpoint: 'customers/search' }
+          post 'food2c/template-app/classifications/:action_name', to: 'food2c_template_app#proxy',
+               constraints: { action_name: /context|save|report/ }
           namespace :channels do
             resource :twilio_channel, only: [:create]
           end

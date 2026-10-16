@@ -5,6 +5,14 @@ import Icon from 'dashboard/components-next/icon/Icon.vue';
 import ContactSortMenu from './components/ContactSortMenu.vue';
 import ContactMoreActions from './components/ContactMoreActions.vue';
 import ComposeConversation from 'dashboard/components-next/NewConversation/ComposeConversation.vue';
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute();
+const router = useRouter();
+
+const openFood2cConversation = () => {
+  router.push({ name: 'food2c_new', params: { accountId: route.params.accountId } });
+};
 
 defineProps({
   showSearch: { type: Boolean, default: true },
@@ -113,6 +121,7 @@ const emit = defineEmits([
             />
           </div>
           <div class="w-px h-4 bg-n-strong" />
+          <Button label="Nova conversa Food2C" size="sm" variant="outline" @click="openFood2cConversation" />
           <ComposeConversation>
             <template #trigger>
               <Button :label="buttonLabel" size="sm" />

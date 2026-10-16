@@ -514,6 +514,31 @@ RSpec.describe 'Conversations API', type: :request do
     let(:pending_conversation) { create(:conversation, inbox: inbox, account: account, status: 'pending') }
     let(:agent_bot) { create(:agent_bot, account: account) }
 
+    context 'when Food2C requires tabulation' do
+      let(:agent) { create(:user, account: account, role: :agent) }
+
+      before { create(:inbox_member, user: agent, inbox: conversation.inbox) }
+
+      around do |example|
+        previous = ENV.fetch('FOOD2C_TABULATION_REQUIRED_ACCOUNT_IDS', nil)
+        ENV['FOOD2C_TABULATION_REQUIRED_ACCOUNT_IDS'] = account.id.to_s
+        example.run
+      ensure
+        ENV['FOOD2C_TABULATION_REQUIRED_ACCOUNT_IDS'] = previous
+      end
+
+      it 'returns an error and keeps the conversation open' do
+        post "/api/v1/accounts/#{account.id}/conversations/#{conversation.display_id}/toggle_status",
+             headers: agent.create_new_auth_token,
+             params: { status: 'resolved' },
+             as: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body['error']).to include('Tabule o atendimento')
+        expect(conversation.reload).to be_open
+      end
+    end
+
     context 'when it is an unauthenticated user' do
       it 'returns unauthorized' do
         post "/api/v1/accounts/#{account.id}/conversations/#{conversation.display_id}/toggle_status"

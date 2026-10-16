@@ -15,6 +15,7 @@ import Suspended from './suspended/Index.vue';
 import NoAccounts from './noAccounts/Index.vue';
 import OnboardingAccountDetails from './onboarding/Index.vue';
 import OnboardingInboxSetup from './onboarding/InboxSetup.vue';
+import Food2cTemplatePage from './Food2cTemplatePage.vue';
 
 export default {
   routes: [
@@ -22,6 +23,20 @@ export default {
       path: frontendURL('accounts/:accountId'),
       component: AppContainer,
       children: [
+        {
+          path: 'food2c/new',
+          name: 'food2c_new',
+          component: Food2cTemplatePage,
+          props: { page: 'new' },
+          meta: { permissions: ['administrator', 'agent', 'custom_role'] },
+        },
+        {
+          path: 'food2c/report',
+          name: 'food2c_report',
+          component: Food2cTemplatePage,
+          props: { page: 'report' },
+          meta: { permissions: ['administrator', 'agent', 'custom_role'] },
+        },
         ...captainRoutes,
         ...inboxRoutes,
         ...conversation.routes,
