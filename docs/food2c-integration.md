@@ -42,7 +42,10 @@ No arquivo `.env` da instalação, configure as três variáveis acima. O ID `1`
 foi confirmado pela URL da conta Food2C (`/app/accounts/1/`).
 
 Antes da troca, faça um backup do PostgreSQL e do arquivo `.env` da instância.
-Na pasta do fork no Lightsail:
+Identifique o projeto Compose em uso com `docker compose ls`. Faça o checkout da
+branch na pasta da instalação existente e preserve o mesmo nome de projeto; os
+volumes `postgres_data` e `storage_data` dependem dele. Não copie um `.env`
+exemplo sobre o arquivo real. Na pasta da instalação no Lightsail:
 
 ```bash
 docker compose -f docker-compose.production.yaml -f docker-compose.food2c.yaml build rails
