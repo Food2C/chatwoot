@@ -290,21 +290,20 @@ export default {
 
 <template>
   <main
-    class="flex flex-col w-full min-h-screen py-20 bg-n-brand/5 dark:bg-n-background sm:px-6 lg:px-8"
+    class="flex flex-col w-full min-h-screen py-20 bg-gradient-to-br from-n-blue-2 via-n-background to-n-accent/10 dark:from-n-background dark:via-n-background dark:to-n-blue-3 sm:px-6 lg:px-8"
   >
     <section class="max-w-5xl mx-auto">
       <img
-        :src="globalConfig.logo"
+        :src="globalConfig.logo || '/brand-assets/logo.svg'"
         :alt="globalConfig.installationName"
-        class="block w-auto h-8 mx-auto dark:hidden"
+        class="block w-auto h-10 mx-auto dark:hidden"
       />
       <img
-        v-if="globalConfig.logoDark"
-        :src="globalConfig.logoDark"
+        :src="globalConfig.logoDark || '/brand-assets/logo_dark.svg'"
         :alt="globalConfig.installationName"
-        class="hidden w-auto h-8 mx-auto dark:block"
+        class="hidden w-auto h-10 mx-auto dark:block"
       />
-      <h2 class="mt-6 text-3xl font-medium text-center text-n-slate-12">
+      <h2 class="mt-6 text-3xl font-semibold text-center text-n-slate-12">
         {{ replaceInstallationName($t('LOGIN.TITLE')) }}
       </h2>
       <p v-if="showSignupLink" class="mt-3 text-sm text-center text-n-slate-11">
@@ -337,7 +336,7 @@ export default {
     <!-- Regular Login Section -->
     <section
       v-else
-      class="bg-white shadow sm:mx-auto mt-11 sm:w-full sm:max-w-lg dark:bg-n-solid-2 p-11 sm:shadow-lg sm:rounded-lg"
+      class="bg-white shadow sm:mx-auto mt-11 sm:w-full sm:max-w-lg dark:bg-n-solid-2 p-11 border border-n-weak sm:shadow-xl rounded-2xl"
       :class="{
         'mb-8 mt-15': !showGoogleOAuth,
         'animate-wiggle': loginApi.hasErrored,

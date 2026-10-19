@@ -1,10 +1,11 @@
 @import 'shared/assets/fonts/inter';
+@import 'shared/assets/fonts/poppins';
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
 body {
-  font-family: Inter, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  font-family: Poppins, Inter, -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
 }
 
 @layer base {
@@ -107,7 +108,7 @@ body {
     --alpha-3: 255, 255, 255, 0.96;
     --black-alpha-1: 0, 0, 0, 0.12;
     --black-alpha-2: 0, 0, 0, 0.04;
-    --border-blue: 39, 129, 246, 0.5;
+    --border-blue: 0, 95, 87, 0.5;
     --white-alpha: 255, 255, 255, 0.8;
   }
 
@@ -207,7 +208,7 @@ body {
     --alpha-3: 36, 38, 45, 0.9;
     --black-alpha-1: 0, 0, 0, 0.3;
     --black-alpha-2: 0, 0, 0, 0.2;
-    --border-blue: 39, 129, 246, 0.5;
+    --border-blue: 120, 220, 199, 0.5;
     --border-container: 236, 236, 236, 0;
     --white-alpha: 255, 255, 255, 0.1;
   }
