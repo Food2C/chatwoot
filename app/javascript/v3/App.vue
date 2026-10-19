@@ -55,12 +55,23 @@ export default {
 @tailwind components;
 @tailwind utilities;
 
+@import '../shared/assets/fonts/poppins';
 @import '../dashboard/assets/scss/next-colors';
 
 html,
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    Poppins,
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif;
   @apply h-full w-full;
 
   input,

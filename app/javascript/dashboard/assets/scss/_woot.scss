@@ -5,6 +5,7 @@
 
 @import 'shared/assets/fonts/InterDisplay/inter-display';
 @import 'shared/assets/fonts/inter';
+@import 'shared/assets/fonts/poppins';
 
 // Next Colors
 @import 'next-colors';
@@ -18,6 +19,7 @@
 html,
 body {
   font-family:
+    'Poppins',
     'Inter',
     -apple-system,
     system-ui,
