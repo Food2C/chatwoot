@@ -2,8 +2,9 @@
 
 Esta branch usa os logos, as cores e a fonte da landing page Food2C. O painel,
 login, ícones do navegador e manifest usam verde `#004747`, laranja `#EB7F49`
-e Poppins. Os arquivos da fonte estão em `public/brand-assets/fonts/` com a
-licença SIL OFL.
+e Poppins. O nome exibido na aba do navegador, no login e na marca da instalação
+é `Food2C Chat`. Os arquivos da fonte estão em `public/brand-assets/fonts/` com
+a licença SIL OFL.
 
 ## Atualizar uma instalação existente
 
