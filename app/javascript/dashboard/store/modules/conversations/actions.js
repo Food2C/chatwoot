@@ -54,7 +54,7 @@ const actions = {
         { commit, dispatch },
         params,
         data,
-        params.assigneeType
+        params.listTab || params.assigneeType
       );
     } catch (error) {
       // Handle error

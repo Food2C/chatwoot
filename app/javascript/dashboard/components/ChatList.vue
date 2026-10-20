@@ -72,7 +72,7 @@ const store = useStore();
 
 const resolveAttributesModalRef = ref(null);
 
-const activeAssigneeTab = ref(wootConstants.ASSIGNEE_TYPE.ME);
+const activeAssigneeTab = ref('new');
 const activeStatus = ref(wootConstants.STATUS_TYPE.OPEN);
 const activeSortBy = ref(wootConstants.SORT_BY_TYPE.LAST_ACTIVITY_AT_DESC);
 const showAdvancedFilters = ref(false);
@@ -176,21 +176,28 @@ const userPermissions = computed(() => {
 });
 
 const assigneeTabItems = computed(() => {
-  return filterItemsByPermission(
+  const availableItems = filterItemsByPermission(
     ASSIGNEE_TYPE_TAB_PERMISSIONS,
     userPermissions.value,
     item => item.permissions
-  ).map(({ key, count: countKey }) => ({
-    key,
-    name: t(`CHAT_LIST.ASSIGNEE_TYPE_TABS.${key}`),
-    count: conversationStats.value[countKey] || 0,
-  }));
+  );
+  return [
+    { source: 'unassigned', key: 'new', count: 'unAssignedCount' },
+    { source: 'me', key: 'me', count: 'mineCount' },
+    { source: 'all', key: 'resolved', count: 'resolvedCount' },
+  ]
+    .filter(item => availableItems.some(available => available.key === item.source))
+    .map(({ key, count }) => ({
+      key,
+      name: t(`CHAT_LIST.ASSIGNEE_TYPE_TABS.${key}`),
+      count: conversationStats.value[count] || 0,
+    }));
 });
 
 const showAssigneeInConversationCard = computed(() => {
   return (
     hasAppliedFiltersOrActiveFolders.value ||
-    activeAssigneeTab.value === wootConstants.ASSIGNEE_TYPE.ALL
+    activeAssigneeTab.value === 'resolved'
   );
 });
 
@@ -222,7 +229,7 @@ const conversationCustomAttributes = useFunctionGetter(
 const activeAssigneeTabCount = computed(() => {
   const count = assigneeTabItems.value.find(
     item => item.key === activeAssigneeTab.value
-  ).count;
+  )?.count || 0;
   return count;
 });
 
@@ -249,7 +256,13 @@ const conversationListPagination = computed(() => {
 const conversationFilters = computed(() => {
   return {
     inboxId: props.conversationInbox ? props.conversationInbox : undefined,
-    assigneeType: activeAssigneeTab.value,
+    assigneeType:
+      activeAssigneeTab.value === 'new'
+        ? wootConstants.ASSIGNEE_TYPE.UNASSIGNED
+        : activeAssigneeTab.value === 'resolved'
+          ? wootConstants.ASSIGNEE_TYPE.ALL
+          : wootConstants.ASSIGNEE_TYPE.ME,
+    listTab: activeAssigneeTab.value,
     status: activeStatus.value,
     sortBy: activeSortBy.value,
     page: conversationListPagination.value,
@@ -302,7 +315,7 @@ function filterByAssigneeTab(conversations) {
       c => c.meta?.assignee?.id === currentUser.value?.id
     );
   }
-  if (activeAssigneeTab.value === wootConstants.ASSIGNEE_TYPE.UNASSIGNED) {
+  if (activeAssigneeTab.value === 'new') {
     return conversations.filter(c => !c.meta?.assignee);
   }
   return [...conversations];
@@ -330,7 +343,7 @@ const conversationList = computed(() => {
       );
     } else if (activeAssigneeTab.value === 'me') {
       localConversationList = [...mineChatsList.value(filters)];
-    } else if (activeAssigneeTab.value === 'unassigned') {
+    } else if (activeAssigneeTab.value === 'new') {
       localConversationList = [...unAssignedChatsList.value(filters)];
     } else {
       localConversationList = [...allChatList.value(filters)];
@@ -380,8 +393,7 @@ const uniqueInboxes = computed(() => {
 // ---------------------- Methods -----------------------
 function setFiltersFromUISettings() {
   const { conversations_filter_by: filterBy = {} } = uiSettings.value;
-  const { status, order_by: orderBy } = filterBy;
-  activeStatus.value = status || wootConstants.STATUS_TYPE.OPEN;
+  const { order_by: orderBy } = filterBy;
   activeSortBy.value = Object.values(wootConstants.SORT_BY_TYPE).includes(
     orderBy
   )
@@ -493,7 +505,7 @@ function initializeExistingFilterToModal() {
   const statusFilter = initializeStatusAndAssigneeFilterToModal(
     activeStatus.value,
     currentUserDetails.value,
-    activeAssigneeTab.value
+    conversationFilters.value.assigneeType
   );
   // TODO: Remove the usage of useCamelCase after migrating useFilter to camelcase
   if (statusFilter) {
@@ -608,6 +620,11 @@ function updateAssigneeTab(selectedTab) {
     resetBulkActions();
     emitter.emit('clearSearchInput');
     activeAssigneeTab.value = selectedTab;
+    activeStatus.value =
+      selectedTab === 'resolved'
+        ? wootConstants.STATUS_TYPE.RESOLVED
+        : wootConstants.STATUS_TYPE.OPEN;
+    store.dispatch('setChatStatusFilter', activeStatus.value);
     if (!currentPage.value) {
       fetchConversations();
     }
@@ -802,15 +819,23 @@ function toggleSelectAll(check) {
 
 useEmitter('fetch_conversation_stats', () => {
   if (hasAppliedFiltersOrActiveFolders.value) return;
-  store.dispatch('conversationStats/get', conversationFilters.value);
+  store.dispatch('conversationStats/get', {
+    ...conversationFilters.value,
+    status: wootConstants.STATUS_TYPE.OPEN,
+  });
+  store.dispatch('conversationStats/getResolved', conversationFilters.value);
 });
 
 onMounted(() => {
+  if (!assigneeTabItems.value.some(item => item.key === activeAssigneeTab.value)) {
+    activeAssigneeTab.value = assigneeTabItems.value[0]?.key || 'me';
+  }
   store.dispatch('setChatListFilters', conversationFilters.value);
   setFiltersFromUISettings();
   store.dispatch('setChatStatusFilter', activeStatus.value);
   store.dispatch('setChatSortFilter', activeSortBy.value);
   resetAndFetchData();
+  store.dispatch('conversationStats/getResolved', conversationFilters.value);
   if (hasActiveFolders.value) {
     store.dispatch('campaigns/get');
   }
@@ -895,7 +920,6 @@ watch(conversationFilters, (newVal, oldVal) => {
       :page-title="pageTitle"
       :has-applied-filters="hasAppliedFilters"
       :has-active-folders="hasActiveFolders"
-      :active-status="activeStatus"
       :is-on-expanded-layout="isOnExpandedLayout"
       :conversation-stats="conversationStats"
       :is-list-loading="chatListLoading && !conversationList.length"

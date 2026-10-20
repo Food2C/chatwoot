@@ -6,6 +6,8 @@ const state = {
   mineCount: 0,
   unAssignedCount: 0,
   allCount: 0,
+  resolvedCount: 0,
+  filteredCount: 0,
 };
 
 export const getters = {
@@ -19,7 +21,7 @@ const fetchMetaData = async (commit, params) => {
     const {
       data: { meta },
     } = response;
-    commit(types.SET_CONV_TAB_META, meta);
+    commit(types.SET_CONV_TAB_META, { meta, status: params.status });
   } catch (error) {
     // ignore
   }
@@ -52,20 +54,43 @@ export const actions = {
   get: ({ commit, state: $state }, params) => {
     metaDebouncers[getMetaDebounceKey($state.allCount)](commit, params);
   },
-  set({ commit }, meta) {
-    commit(types.SET_CONV_TAB_META, meta);
+  async getResolved({ commit }, params) {
+    try {
+      const response = await ConversationApi.meta({
+        ...params,
+        status: 'resolved',
+        assigneeType: 'all',
+      });
+      commit(types.SET_CONV_TAB_META, {
+        meta: response.data.meta,
+        status: 'resolved',
+      });
+    } catch (error) {
+      // Leave the previous count in place when the metadata request fails.
+    }
+  },
+  set({ commit }, data) {
+    commit(types.SET_CONV_TAB_META, data);
   },
 };
 
 export const mutations = {
-  [types.SET_CONV_TAB_META](
-    $state,
-    {
+  [types.SET_CONV_TAB_META]($state, { meta, status }) {
+    if (status === 'filtered') {
+      $state.filteredCount = meta.all_count || 0;
+      $state.updatedOn = new Date();
+      return;
+    }
+    if (status === 'resolved') {
+      $state.resolvedCount = meta.all_count || 0;
+      $state.updatedOn = new Date();
+      return;
+    }
+    const {
       mine_count: mineCount,
       unassigned_count: unAssignedCount,
       all_count: allCount,
-    } = {}
-  ) {
+    } = meta || {};
     $state.mineCount = mineCount;
     $state.allCount = allCount;
     $state.unAssignedCount = unAssignedCount;

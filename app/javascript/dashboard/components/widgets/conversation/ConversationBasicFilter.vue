@@ -14,6 +14,10 @@ defineProps({
     type: Boolean,
     required: true,
   },
+  hideStatusFilter: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['changeFilter']);
@@ -157,7 +161,10 @@ const handleSortChange = value => {
         'ltr:right-0 rtl:left-0': isOnExpandedLayout,
       }"
     >
-      <div class="flex items-center justify-between last:mt-4 gap-2">
+      <div
+        v-if="!hideStatusFilter"
+        class="flex items-center justify-between last:mt-4 gap-2"
+      >
         <span class="text-sm truncate text-n-slate-12">
           {{ $t('CHAT_LIST.CHAT_SORT.STATUS') }}
         </span>

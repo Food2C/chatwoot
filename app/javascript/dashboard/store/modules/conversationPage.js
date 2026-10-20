@@ -2,13 +2,17 @@ import * as types from '../mutation-types';
 
 const state = {
   currentPage: {
+    new: 0,
     me: 0,
+    resolved: 0,
     unassigned: 0,
     all: 0,
     appliedFilters: 0,
   },
   hasEndReached: {
+    new: false,
     me: false,
+    resolved: false,
     unassigned: false,
     all: false,
   },
@@ -60,14 +64,18 @@ export const mutations = {
   },
   [types.default.CLEAR_CONVERSATION_PAGE]: $state => {
     $state.currentPage = {
+      new: 0,
       me: 0,
+      resolved: 0,
       unassigned: 0,
       all: 0,
       appliedFilters: 0,
     };
 
     $state.hasEndReached = {
+      new: false,
       me: false,
+      resolved: false,
       unassigned: false,
       all: false,
       appliedFilters: false,

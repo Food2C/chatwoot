@@ -15,7 +15,9 @@
     },
     "FILTER_ALL": "All",
     "ASSIGNEE_TYPE_TABS": {
+      "new": "New",
       "me": "Mine",
+      "resolved": "Resolved",
       "unassigned": "Unassigned",
       "all": "All"
     },

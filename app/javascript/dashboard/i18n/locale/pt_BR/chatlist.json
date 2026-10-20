@@ -15,7 +15,9 @@
     },
     "FILTER_ALL": "Todos",
     "ASSIGNEE_TYPE_TABS": {
+      "new": "Novas",
       "me": "Minhas",
+      "resolved": "Resolvidas",
       "unassigned": "Não atribuídas",
       "all": "Todos"
     },

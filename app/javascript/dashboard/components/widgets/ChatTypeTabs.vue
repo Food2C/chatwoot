@@ -32,12 +32,8 @@ const onTabChange = selectedTabIndex => {
 const keyboardEvents = {
   'Alt+KeyN': {
     action: () => {
-      if (props.activeTab === wootConstants.ASSIGNEE_TYPE.ALL) {
-        onTabChange(0);
-      } else {
-        const nextIndex = (activeTabIndex.value + 1) % props.items.length;
-        onTabChange(nextIndex);
-      }
+      const nextIndex = (activeTabIndex.value + 1) % props.items.length;
+      onTabChange(nextIndex);
     },
   },
 };

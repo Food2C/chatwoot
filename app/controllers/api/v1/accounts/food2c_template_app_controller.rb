@@ -9,6 +9,7 @@ class Api::V1::Accounts::Food2cTemplateAppController < Api::V1::Accounts::BaseCo
 
   ENDPOINTS = %w[
     templates customer customers/search history send classification-options
+    template-visibility
     classifications/context classifications/save classifications/report
   ].freeze
 
@@ -27,6 +28,7 @@ class Api::V1::Accounts::Food2cTemplateAppController < Api::V1::Accounts::BaseCo
 
     data = JSON.parse(upstream.body)
     data['channels'] = Array(data['channels']).select { |item| item['chatwoot_account_id'].to_i == Current.account.id }
+    data['can_manage_templates'] = Current.account_user.administrator?
     response.headers['Cache-Control'] = 'no-store'
     render json: data
   rescue StandardError => e
@@ -41,8 +43,10 @@ class Api::V1::Accounts::Food2cTemplateAppController < Api::V1::Accounts::BaseCo
     return render json: { error: 'invalid_request' }, status: :bad_request unless payload.is_a?(Hash)
     return head :forbidden if payload['chatwoot_account_id'].present? && payload['chatwoot_account_id'].to_i != Current.account.id
     return head :forbidden if endpoint == 'classification-options' && payload['action'] != 'list' && !Current.account_user.administrator?
+    return head :forbidden if endpoint == 'template-visibility' && !Current.account_user.administrator?
 
     payload['chatwoot_account_id'] = Current.account.id
+    payload['initiated_by_id'] = Current.user.id if endpoint == 'send'
     if endpoint == 'classifications/save'
       payload['classified_by_id'] = Current.user.id
       payload['classified_by_name'] = Current.user.name
