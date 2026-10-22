@@ -4,8 +4,10 @@ import { debounce } from '@chatwoot/utils';
 
 const state = {
   mineCount: 0,
+  otherCount: 0,
   unAssignedCount: 0,
   allCount: 0,
+  allStatusesCount: 0,
   resolvedCount: 0,
   filteredCount: 0,
 };
@@ -69,6 +71,21 @@ export const actions = {
       // Leave the previous count in place when the metadata request fails.
     }
   },
+  async getAllStatuses({ commit }, params) {
+    try {
+      const response = await ConversationApi.meta({
+        ...params,
+        status: 'all',
+        assigneeType: 'all',
+      });
+      commit(types.SET_CONV_TAB_META, {
+        meta: response.data.meta,
+        status: 'all',
+      });
+    } catch (error) {
+      // Leave the previous count in place when the metadata request fails.
+    }
+  },
   set({ commit }, data) {
     commit(types.SET_CONV_TAB_META, data);
   },
@@ -86,12 +103,19 @@ export const mutations = {
       $state.updatedOn = new Date();
       return;
     }
+    if (status === 'all') {
+      $state.allStatusesCount = meta.all_count || 0;
+      $state.updatedOn = new Date();
+      return;
+    }
     const {
       mine_count: mineCount,
+      assigned_count: assignedCount,
       unassigned_count: unAssignedCount,
       all_count: allCount,
     } = meta || {};
     $state.mineCount = mineCount;
+    $state.otherCount = assignedCount - mineCount;
     $state.allCount = allCount;
     $state.unAssignedCount = unAssignedCount;
     $state.updatedOn = new Date();

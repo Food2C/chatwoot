@@ -17,9 +17,10 @@
     "ASSIGNEE_TYPE_TABS": {
       "new": "New",
       "me": "Mine",
+      "others": "Other agents",
       "resolved": "Resolved",
       "unassigned": "Unassigned",
-      "all": "All"
+      "all": "All conversations"
     },
     "CHAT_STATUS_FILTER_ITEMS": {
       "open": {
